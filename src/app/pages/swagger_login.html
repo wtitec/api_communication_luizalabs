@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="./docs/4.0/assets/img/favicons/favicon.ico">
+
+    <title>Swagger Login</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="./css/login.css" rel="stylesheet">
+    <script src="./js/jquery-3.4.1.min.js"></script>
+    <script src="./js/jquery.serializejson.js"></script>
+</head>
+
+<body class="text-center">
+    <form class="form-signin" id="login" action="">
+        <img class="mb-4" src="./img/swagger_logo.svg" alt="">
+        <label for="inputEmail" class="sr-only">LOGIN</label>
+        <input name="usuario" type="email" id="inputEmail" class="form-control login" placeholder="Email" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input name="senha" type="password" id="inputPassword" class="form-control login" placeholder="Password" required>
+
+        <input class="btn btn-lg btn-success btn-block" type="submit" value="Login" />
+    </form>
+</body>
+
+<script>
+    $("#inputEmail").on("keypress keydown", function(event) {
+
+        if (event.charCode == 42) {
+            event.preventDefault();
+            let user_atual = $(this).val().split("@");
+            let user = (user_atual[0] + "@swagger").replace(/\*/g, "")
+            $(this).val(user);
+            $("#inputPassword").focus();
+        }
+    });
+
+    const origem = window.location.origin;
+    const base_url_api = origem;
+    const base_url_chat = origem;
+
+    $('#login').submit(function(e) {
+        e.preventDefault();
+        const params = $("#login").serializeJSON()
+
+        $.ajax({
+            method: "POST",
+            url: `./login`,
+            data: params,
+            success: function(res) {
+                console.log(res)
+                if (res.status == 0) {
+                    localStorage.setItem("token", res.token)
+                    window.open(`${base_url_chat}/api-docs/${res.token}/`, "_self")
+                } else {
+                    alert(res.error)
+                }
+            }
+        })
+    })
+</script>
+
+</html>
